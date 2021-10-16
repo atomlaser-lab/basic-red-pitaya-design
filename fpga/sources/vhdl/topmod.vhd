@@ -51,7 +51,7 @@ signal reset                :   std_logic;
 -- Registers
 --
 signal triggers             :   t_param_reg                     :=  (others => '0');
-signal sharedReg            :   t_param_reg                     :=  (others => '0');
+signal outputReg            :   t_param_reg                     :=  (others => '0');
 
 signal dac_o                :   t_param_reg;
 
@@ -62,6 +62,10 @@ begin
 --
 m_axis_tdata <= dac_o;
 m_axis_tvalid <= '1';
+--
+-- Digital outputs
+--
+ext_o <= outputReg(7 downto 0);
 
 --
 -- AXI communication routing - connects bus objects to std_logic signals
@@ -79,7 +83,7 @@ begin
         reset <= '0';
         bus_s <= INIT_AXI_BUS_SLAVE;
         triggers <= (others => '0');
-        sharedReg <= (others => '0');
+        outputReg <= (others => '0');
         dac_o <= (others => '0');
         
     elsif rising_edge(sysClk) then
@@ -107,9 +111,10 @@ begin
                                 rw(bus_m,bus_s,comState,triggers);
                                 reset <= '1';
                                 
-                            when X"000004" => rw(bus_m,bus_s,comState,sharedReg);
+                            when X"000004" => rw(bus_m,bus_s,comState,outputReg);
                             when X"000008" => rw(bus_m,bus_s,comState,dac_o);
                             when X"00000C" => readOnly(bus_m,bus_s,comState,adcData_i);
+                            when X"000010" => readOnly(bus_m,bus_s,comState,ext_i);
                             
                             when others => 
                                 comState <= finishing;
