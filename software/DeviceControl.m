@@ -9,6 +9,7 @@ classdef DeviceControl < handle
         ext_o
         adc
         ext_i
+        led_o
     end
     
     properties(SetAccess = protected)
@@ -58,6 +59,8 @@ classdef DeviceControl < handle
             
             self.ext_o = DeviceParameter([0,7],self.outputReg)...
                 .setLimits('lower',0,'upper',255);
+            self.led_o = DeviceParameter([8,15],self.outputReg)...
+                .setLimits('lower',0,'upper',255);
             
             self.adc = DeviceParameter([0,15],self.adcReg,'int16')...
                 .setFunctions('to',@(x) self.convert2int(x),'from',@(x) self.convert2volts(x));
@@ -73,6 +76,7 @@ classdef DeviceControl < handle
             self.dac(1).set(0);
             self.dac(2).set(0);
             self.ext_o.set(0);
+            self.led_o.set(0);
         end
         
         function self = check(self)
@@ -93,6 +97,7 @@ classdef DeviceControl < handle
             self.adcReg.read;
             
             self.ext_o.get;
+            self.led_o.get;
             self.ext_i.get;
             for nn = 1:numel(self.dac)
                 self.dac(nn).get;
@@ -131,6 +136,7 @@ classdef DeviceControl < handle
             self.adcReg.print('adcReg',strwidth);
             fprintf(1,'\t ----------------------------------\n');
             fprintf(1,'\t Parameters\n');
+            self.led_o.print('LEDs',strwidth,'%02x');
             self.ext_o.print('External output',strwidth,'%02x');
             self.ext_i.print('External input',strwidth,'%02x');
             self.dac(1).print('DAC 1',strwidth,'%.3f');
@@ -140,39 +146,6 @@ classdef DeviceControl < handle
         end
         
         
-    end
-    
-    methods(Static)
-        function d = loadData(filename,dt,c)
-            if nargin == 0 || isempty(filename)
-                filename = 'SavedData.bin';
-            end
-            
-            %Load data
-            fid = fopen(filename,'r');
-            fseek(fid,0,'eof');
-            fsize = ftell(fid);
-            frewind(fid);
-            x = fread(fid,fsize,'uint8');
-            fclose(fid);
-            
-            d.v = DeviceControl.convertData(x,c);
-            d.t = dt*(0:(size(d.v,1)-1));
-        end
-        
-        function v = convertData(raw,c)
-            Nraw = numel(raw);
-            d = zeros(Nraw/4,2,'int16');
-            
-            mm = 1;
-            for nn = 1:4:Nraw
-                d(mm,1) = typecast(uint8(raw(nn+(0:1))),'int16');
-                d(mm,2) = typecast(uint8(raw(nn+(2:3))),'int16');
-                mm = mm + 1;
-            end
-
-            v = double(d)*c;
-        end
     end
     
 end

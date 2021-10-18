@@ -21,6 +21,7 @@ entity topmod is
         resp_o          :   out std_logic_vector(1 downto 0);                   --Response in
         
         ext_o           :   out std_logic_vector(7 downto 0);
+        led_o           :   out std_logic_vector(7 downto 0);
         
         adcClk          :   in  std_logic;
         adcData_i       :   in  std_logic_vector(31 downto 0);
@@ -40,6 +41,16 @@ ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
 ATTRIBUTE X_INTERFACE_PARAMETER of m_axis_tdata: SIGNAL is "CLK_DOMAIN system_processing_system7_0_0_FCLK_CLK0,FREQ_HZ 125000000";
 ATTRIBUTE X_INTERFACE_PARAMETER of m_axis_tvalid: SIGNAL is "CLK_DOMAIN system_processing_system7_0_0_FCLK_CLK0,FREQ_HZ 125000000";
 
+COMPONENT BlockMemory
+  PORT (
+    clka : IN STD_LOGIC;
+    wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    addra : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    dina : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+    douta : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+  );
+END COMPONENT;
+
 --
 -- AXI communication signals
 --
@@ -52,8 +63,14 @@ signal reset                :   std_logic;
 --
 signal triggers             :   t_param_reg                     :=  (others => '0');
 signal outputReg            :   t_param_reg                     :=  (others => '0');
-
 signal dac_o                :   t_param_reg;
+--
+-- Block memory signals
+--
+signal wea          :   std_logic_vector(0 downto 0);
+signal addra        :   std_logic_vector(7 downto 0);
+signal dina, douta  :   std_logic_vector(31 downto 0);
+signal memDelay     :   unsigned(1 downto 0);
 
 begin
 
@@ -66,7 +83,18 @@ m_axis_tvalid <= '1';
 -- Digital outputs
 --
 ext_o <= outputReg(7 downto 0);
-
+led_o <= outputReg(15 downto 8);
+--
+-- Block memory
+--
+BM : BlockMemory
+PORT MAP (
+    clka    => sysClk,
+    wea     => wea,
+    addra   => addra,
+    dina    => dina,
+    douta   => douta
+);
 --
 -- AXI communication routing - connects bus objects to std_logic signals
 --
@@ -85,13 +113,17 @@ begin
         triggers <= (others => '0');
         outputReg <= (others => '0');
         dac_o <= (others => '0');
-        
+        addra <= (others => '0');
+        dina <= (others => '0');
+        memDelay <= (others => '0');
+        wea <= "0";
     elsif rising_edge(sysClk) then
         FSM: case(comState) is
             when idle =>
                 triggers <= (others => '0');
                 reset <= '0';
                 bus_s.resp <= "00";
+                memDelay <= "00";
                 if bus_m.valid(0) = '1' then
                     comState <= processing;
                 end if;
@@ -103,14 +135,7 @@ begin
                     --
                     when X"00" =>
                         ParamCase: case(bus_m.addr(23 downto 0)) is
-                            --
-                            -- This issues a reset signal to the memories and writes data to
-                            -- the trigger registers
-                            --
-                            when X"000000" => 
-                                rw(bus_m,bus_s,comState,triggers);
-                                reset <= '1';
-                                
+                            when X"000000" => rw(bus_m,bus_s,comState,triggers);
                             when X"000004" => rw(bus_m,bus_s,comState,outputReg);
                             when X"000008" => rw(bus_m,bus_s,comState,dac_o);
                             when X"00000C" => readOnly(bus_m,bus_s,comState,adcData_i);
@@ -120,14 +145,41 @@ begin
                                 comState <= finishing;
                                 bus_s.resp <= "11";
                         end case;
+                        
+                    --
+                    -- Read from/write to memory
+                    --
+                    when X"01" =>
+                        addra <= std_logic_vector(bus_m.addr(addra'length - 1 downto 0));
+                        if bus_m.valid(1) = '0' then
+                            --
+                            -- If writing data, route input address and data to memory
+                            --
+                            comState <= finishing;
+                            dina <= bus_m.data;
+                            wea <= "1";
+                            bus_s.resp <= "01";
+                        else
+                            --
+                            -- If reading from memory, we need an extra 2 wait cycles
+                            --
+                            if memDelay = "00" then
+                                memDelay <= "11";
+                            elsif memDelay > "01" then
+                                memDelay <= memDelay - 1;
+                            else
+                                bus_s.data <= douta;
+                                bus_s.resp <= "01";
+                                comState <= finishing;
+                            end if;
+                        end if;
                     
                     when others => 
                         comState <= finishing;
                         bus_s.resp <= "11";
                 end case;
             when finishing =>
---                triggers <= (others => '0');
---                reset <= '0';
+                wea <= "0";
                 comState <= idle;
 
             when others => comState <= idle;

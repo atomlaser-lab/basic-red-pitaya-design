@@ -12,6 +12,9 @@ where `ip_addr` is the IP address of the Red Pitaya.  You can then fetch data us
 
 DAC outputs can be written using `dev.dac(<index>).set(<value>).write` where `<index>` is either 1 or 2 and `<value>` is a value in volts between -1 V and 1 V. 
 
+For testing purposes, a block memory element with 256 address spaces and a write/read depth of 32 has been included to show how to write to and read from a memory element.  The C program 'testMemory.c' can be used for this purpose. Copy it to the Red Pitaya, compile it using the command 'gcc -o testMemory testMemory.c', and then run it using './testMemory 10' to write to and then read from 10 addresses in sequence.  You can replace '10' with any integer up to 255.
+
+
 # Creating the project
 
 To create the project, clone the repository to a directory on your computer, open Vivado, navigate to the fpga/ directory (use `pwd` in the TCL console to determine your current directory and `cd` to navigate, just like in Bash), and then run `source make-project.tcl` which will create the project files under the directory `basic-project`.  If you want a different file name, open the `make-project.tcl` file and edit the line under the comment `# Set the project name`.  This should create the project with no errors.  It may not correctly assign the AXI addresses, so you will need to open the address editor and assign the `PS7/AXI_Parse_0/s_axi` interface the address range `0x4000_000` to `0x7fff_ffff`.
