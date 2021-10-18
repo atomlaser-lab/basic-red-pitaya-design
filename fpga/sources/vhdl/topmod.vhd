@@ -150,7 +150,7 @@ begin
                     -- Read from/write to memory
                     --
                     when X"01" =>
-                        addra <= std_logic_vector(bus_m.addr(addra'length - 1 downto 0));
+                        addra <= std_logic_vector(bus_m.addr(addra'length + 1 downto 2));
                         if bus_m.valid(1) = '0' then
                             --
                             -- If writing data, route input address and data to memory
