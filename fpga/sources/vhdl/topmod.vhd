@@ -51,6 +51,17 @@ COMPONENT BlockMemory
   );
 END COMPONENT;
 
+COMPONENT DDS1
+  PORT (
+    aclk : IN STD_LOGIC;
+    aresetn : IN STD_LOGIC;
+    s_axis_phase_tvalid : IN STD_LOGIC;
+    s_axis_phase_tdata : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
+    m_axis_data_tvalid : OUT STD_LOGIC;
+    m_axis_data_tdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+  );
+END COMPONENT;
+
 --
 -- AXI communication signals
 --
@@ -64,6 +75,16 @@ signal reset                :   std_logic;
 signal triggers             :   t_param_reg                     :=  (others => '0');
 signal outputReg            :   t_param_reg                     :=  (others => '0');
 signal dac_o                :   t_param_reg;
+signal dds_phase_inc_reg    :   t_param_reg;
+signal dds_phase_off_reg    :   t_param_reg;
+--
+-- DDS signals
+--
+signal phase_offset         :   std_logic_vector(31 downto 0);
+signal phase_inc            :   std_logic_vector(31 downto 0);
+signal dds_phase_i          :   std_logic_vector(63 downto 0);
+signal dds_o                :   std_logic_vector(31 downto 0);
+signal dds_cos, dds_sin     :   std_logic_vector(9 downto 0);
 --
 -- Block memory signals
 --
@@ -85,6 +106,11 @@ m_axis_tvalid <= '1';
 ext_o <= outputReg(7 downto 0);
 led_o <= outputReg(15 downto 8);
 --
+-- Signal assignement
+--
+
+
+--
 -- Block memory
 --
 BM : BlockMemory
@@ -95,6 +121,28 @@ PORT MAP (
     dina    => dina,
     douta   => douta
 );
+--
+-- DDS
+--
+DDS_inst : DDS1
+  PORT MAP (
+    aclk                    => adcClk,
+    aresetn                 => aresetn,
+    s_axis_phase_tvalid     => '1',
+    s_axis_phase_tdata      => dds_phase_i,
+    m_axis_data_tvalid      => open,
+    m_axis_data_tdata       => dds_o
+  );
+  
+phase_inc <= dds_phase_inc_reg;
+phase_offset <= dds_phase_off_reg;
+dds_phase_i <= phase_offset & phase_inc;
+dds_cos <= dds_o(9 downto 0);
+dds_sin <= dds_o(25 downto 16);
+
+dac_o(15 downto 0) <= std_logic_vector(shift_left(resize(signed(dds_cos),16),4));
+dac_o(31 downto 16) <= std_logic_vector(shift_left(resize(signed(dds_sin),16),4));
+
 --
 -- AXI communication routing - connects bus objects to std_logic signals
 --
@@ -112,7 +160,8 @@ begin
         bus_s <= INIT_AXI_BUS_SLAVE;
         triggers <= (others => '0');
         outputReg <= (others => '0');
-        dac_o <= (others => '0');
+        dds_phase_off_reg <= (others => '0');
+        dds_phase_inc_reg <= std_logic_vector(to_unsigned(34359738,32));    --1 MHz with 32 bit DDS width and 125 MHz clock frequency
         addra <= (others => '0');
         dina <= (others => '0');
         memDelay <= (others => '0');
@@ -137,9 +186,11 @@ begin
                         ParamCase: case(bus_m.addr(23 downto 0)) is
                             when X"000000" => rw(bus_m,bus_s,comState,triggers);
                             when X"000004" => rw(bus_m,bus_s,comState,outputReg);
-                            when X"000008" => rw(bus_m,bus_s,comState,dac_o);
+--                            when X"000008" => rw(bus_m,bus_s,comState,dac_o);
                             when X"00000C" => readOnly(bus_m,bus_s,comState,adcData_i);
                             when X"000010" => readOnly(bus_m,bus_s,comState,ext_i);
+                            when X"000014" => rw(bus_m,bus_s,comState,dds_phase_inc_reg);
+                            when X"000018" => rw(bus_m,bus_s,comState,dds_phase_off_reg);
                             
                             when others => 
                                 comState <= finishing;
