@@ -175,20 +175,10 @@
         ],
         "vertices": {
             "V0": {
-                "VM": "system",
-                "VT": "BC"
+                "VH": "1",
+                "VT": "PM"
             },
             "V1": {
-                "VH": "2",
-                "VM": "system",
-                "VT": "VR"
-            },
-            "V2": {
-                "VH": "2",
-                "VT": "PM",
-                "TU": "active"
-            },
-            "V3": {
                 "VT": "AC",
                 "BA": "0x40000000",
                 "HA": "0x7FFFFFFF",
@@ -209,17 +199,8 @@
         },
         "edges": [
             {
-                "src": "V0",
-                "trg": "V1"
-            },
-            {
                 "src": "V1",
-                "trg": "V2"
-            },
-            {
-                "src": "V3",
-                "trg": "V2",
-                "EH": "2"
+                "trg": "V0"
             }
         ]
     }
