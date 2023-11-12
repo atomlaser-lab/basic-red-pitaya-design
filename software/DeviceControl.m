@@ -10,6 +10,7 @@ classdef DeviceControl < handle
         adc
         ext_i
         led_o
+        pwm
     end
     
     properties(SetAccess = protected)
@@ -19,6 +20,7 @@ classdef DeviceControl < handle
         inputReg
         dacReg
         adcReg
+        pwmReg
     end
     
     properties(Constant)
@@ -47,7 +49,7 @@ classdef DeviceControl < handle
             self.dacReg = DeviceRegister('8',self.conn);
             self.adcReg = DeviceRegister('C',self.conn);
             self.inputReg = DeviceRegister('10',self.conn);
-            
+            self.pwmReg = DeviceRegister('14',self.conn);
             
             self.dac = DeviceParameter([0,15],self.dacReg,'int16')...
                 .setLimits('lower',-1,'upper',1)...
@@ -69,6 +71,13 @@ classdef DeviceControl < handle
                 .setFunctions('to',@(x) self.convert2int(x),'from',@(x) self.convert2volts(x));
             
             self.ext_i = DeviceParameter([0,7],self.inputReg);
+
+            self.pwm = DeviceParameter.empty;
+            for nn = 1:4
+                self.pwm(nn) = DeviceParameter(8*(nn - 1) + [0,7],self.pwmReg)...
+                    .setLimits('lower',0,'upper',1.62)...
+                    .setFunctions('to',@(x) x/1.62*255,'from',@(x) x/255*1.62);
+            end
             
         end
         
@@ -77,6 +86,9 @@ classdef DeviceControl < handle
             self.dac(2).set(0);
             self.ext_o.set(0);
             self.led_o.set(0);
+            for nn = 1:numel(self.pwm)
+                self.pwm(nn).set(0);
+            end
         end
         
         function self = check(self)
@@ -87,6 +99,7 @@ classdef DeviceControl < handle
             self.check;
             self.outputReg.write;
             self.dacReg.write;
+            self.pwmReg.write;
         end
         
         function self = fetch(self)
@@ -95,6 +108,7 @@ classdef DeviceControl < handle
             self.dacReg.read;
             self.inputReg.read;
             self.adcReg.read;
+            self.pwm.read;
             
             self.ext_o.get;
             self.led_o.get;
@@ -105,6 +119,10 @@ classdef DeviceControl < handle
             
             for nn = 1:numel(self.adc)
                 self.adc(nn).get;
+            end
+
+            for nn = 1:numel(self.pwm)
+                self.pwm(nn).get;
             end
         end
         
@@ -134,6 +152,7 @@ classdef DeviceControl < handle
             self.dacReg.print('dacReg',strwidth);
             self.inputReg.print('inputReg',strwidth);
             self.adcReg.print('adcReg',strwidth);
+            self.pwmReg.print('pwmReg',strwidth);
             fprintf(1,'\t ----------------------------------\n');
             fprintf(1,'\t Parameters\n');
             self.led_o.print('LEDs',strwidth,'%02x');
@@ -143,6 +162,9 @@ classdef DeviceControl < handle
             self.dac(2).print('DAC 2',strwidth,'%.3f');
             self.adc(1).print('ADC 1',strwidth,'%.3f');
             self.adc(2).print('ADC 2',strwidth,'%.3f');
+            for nn = 1:numel(self.pwm)
+                self.pwm(nn).print(sprintf('PWM %d',nn),strwidth,'%.3f');
+            end
         end
         
         

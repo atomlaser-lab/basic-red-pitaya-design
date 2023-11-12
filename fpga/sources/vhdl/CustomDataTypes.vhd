@@ -31,6 +31,13 @@ subtype t_gain is signed(GAIN_WIDTH-1 downto 0);
 type t_gain_array is array(natural range <>) of t_gain;
 
 --
+-- Define PWM types
+--
+constant PWM_DATA_WIDTH     :   natural :=  8;
+subtype t_pwm is unsigned(PWM_DATA_WIDTH - 1 downto 0);
+type t_pwm_array is array(natural range <>) of t_pwm;
+
+--
 -- Defines AXI address and data widths
 --
 constant MEM_ADDR_WIDTH :   natural :=  14;

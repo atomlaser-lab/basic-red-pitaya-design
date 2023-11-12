@@ -11,6 +11,7 @@ use work.AXI_Bus_Package.all;
 entity topmod is
     port (
         sysClk          :   in  std_logic;
+        sysClkx2        :   in  std_logic;
         aresetn         :   in  std_logic;
         ext_i           :   in  std_logic_vector(7 downto 0);
 
@@ -22,6 +23,7 @@ entity topmod is
         
         ext_o           :   out std_logic_vector(7 downto 0);
         led_o           :   out std_logic_vector(7 downto 0);
+        pwm_o           :   out std_logic_vector(3 downto 0);
         
         adcClk          :   in  std_logic;
         adcData_i       :   in  std_logic_vector(31 downto 0);
@@ -51,6 +53,21 @@ COMPONENT BlockMemory
   );
 END COMPONENT;
 
+component PWM_Generator is
+    port(
+        --
+        -- Clocking
+        --
+        clk         :   in  std_logic;
+        aresetn     :   in  std_logic;
+        --
+        -- Input/outputs
+        --
+        data_i      :   in  t_pwm_array;
+        pwm_o       :   out std_logic_vector   
+    );
+end component;
+
 --
 -- AXI communication signals
 --
@@ -64,6 +81,7 @@ signal reset                :   std_logic;
 signal triggers             :   t_param_reg                     :=  (others => '0');
 signal outputReg            :   t_param_reg                     :=  (others => '0');
 signal dac_o                :   t_param_reg;
+signal pwmReg               :   t_param_reg;
 --
 -- Block memory signals
 --
@@ -71,6 +89,10 @@ signal wea          :   std_logic_vector(0 downto 0);
 signal addra        :   std_logic_vector(7 downto 0);
 signal dina, douta  :   std_logic_vector(31 downto 0);
 signal memDelay     :   unsigned(1 downto 0);
+--
+-- PWM signals
+--
+signal pwm_data     :   t_pwm_array(3 downto 0); 
 
 begin
 
@@ -96,6 +118,20 @@ PORT MAP (
     douta   => douta
 );
 --
+-- PWM outputs
+--
+pwm_data(0) <= unsigned(pwmReg(7 downto 0));
+pwm_data(1) <= unsigned(pwmReg(15 downto 8));
+pwm_data(2) <= unsigned(pwmReg(23 downto 16));
+pwm_data(3) <= unsigned(pwmReg(31 downto 24));
+PMW1: PWM_Generator
+port map(
+    clk     =>  sysClkx2,
+    aresetn =>  aresetn,
+    data_i  =>  pwm_data,
+    pwm_o   =>  pwm_o
+);
+--
 -- AXI communication routing - connects bus objects to std_logic signals
 --
 bus_m.addr <= addr_i;
@@ -113,6 +149,7 @@ begin
         triggers <= (others => '0');
         outputReg <= (others => '0');
         dac_o <= (others => '0');
+        pwmReg <= (others => '0');
         addra <= (others => '0');
         dina <= (others => '0');
         memDelay <= (others => '0');
@@ -140,6 +177,7 @@ begin
                             when X"000008" => rw(bus_m,bus_s,comState,dac_o);
                             when X"00000C" => readOnly(bus_m,bus_s,comState,adcData_i);
                             when X"000010" => readOnly(bus_m,bus_s,comState,ext_i);
+                            when X"000014" => rw(bus_m,bus_s,comState,pwmReg);
                             
                             when others => 
                                 comState <= finishing;
