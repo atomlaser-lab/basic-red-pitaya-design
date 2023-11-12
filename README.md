@@ -17,7 +17,7 @@ For testing purposes, a block memory element with 256 address spaces and a write
 
 # Creating the project
 
-When creating the project, make sure to use the correct Vivado version.  The Git version v2020.2 works for Vivado 2020.2, while the version v2023.1 works for Vivado 2023.1.  The canon branch will be updated for Vivado 2023.  The TCL script used to create the Vivado projects are unfortunately not interchangeable.
+When creating the project, make sure to use the correct Vivado version.  The Git version v2020.2 works for Vivado 2020.2, while the version v2023.1 works for Vivado 2023.1.  The TCL script used to create the Vivado projects are unfortunately not interchangeable.
 
 To create the project, clone the repository to a directory on your computer, open Vivado, navigate to the fpga/ directory (use `pwd` in the TCL console to determine your current directory and `cd` to navigate, just like in Bash), and then run `source make-project.tcl` which will create the project files under the directory `basic-project`.  If you want a different file name, open the `make-project.tcl` file and edit the line under the comment `# Set the project name`.  This should create the project with no errors.  It may not correctly assign the AXI addresses, so you will need to open the address editor and assign the `PS7/AXI_Parse_0/s_axi` interface the address range `0x4000_000` to `0x7fff_ffff`.
 

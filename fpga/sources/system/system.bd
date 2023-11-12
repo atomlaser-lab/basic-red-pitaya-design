@@ -1,14 +1,13 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0xC3AD17F5BFD800B7",
+      "boundary_crc": "0xC3AD17F527D5DB81",
       "device": "xc7z010clg400-1",
-      "gen_directory": "../../../../rp-feedback.gen/sources_1/bd/system",
+      "gen_directory": "../../../../basic-project.gen/sources_1/bd/system",
       "name": "system",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "None",
-      "tool_version": "2023.1",
-      "validated": "true"
+      "tool_version": "2023.1"
     },
     "design_tree": {
       "Utility_Buffers": {
@@ -257,32 +256,12 @@
       "dac_clk_o": {
         "direction": "O",
         "left": "0",
-        "right": "0",
-        "parameters": {
-          "CLK_DOMAIN": {
-            "value": "system_AXIS_Red_Pitaya_DAC_0_0_dac_clk",
-            "value_src": "default_prop"
-          },
-          "FREQ_HZ": {
-            "value": "100000000",
-            "value_src": "default_prop"
-          },
-          "PHASE": {
-            "value": "0.000",
-            "value_src": "default_prop"
-          }
-        }
+        "right": "0"
       },
       "dac_rst_o": {
         "direction": "O",
         "left": "0",
-        "right": "0",
-        "parameters": {
-          "POLARITY": {
-            "value": "ACTIVE_LOW",
-            "value_src": "default_prop"
-          }
-        }
+        "right": "0"
       },
       "dac_sel_o": {
         "direction": "O",
@@ -302,40 +281,12 @@
       "daisy_p_o": {
         "direction": "O",
         "left": "1",
-        "right": "0",
-        "parameters": {
-          "CLK_DOMAIN": {
-            "value": "system_util_ds_buf_1_0_IBUF_OUT",
-            "value_src": "ip_prop"
-          },
-          "FREQ_HZ": {
-            "value": "100000000",
-            "value_src": "ip_prop"
-          },
-          "PHASE": {
-            "value": "0.0",
-            "value_src": "ip_prop"
-          }
-        }
+        "right": "0"
       },
       "daisy_n_o": {
         "direction": "O",
         "left": "1",
-        "right": "0",
-        "parameters": {
-          "CLK_DOMAIN": {
-            "value": "system_util_ds_buf_1_0_IBUF_OUT",
-            "value_src": "ip_prop"
-          },
-          "FREQ_HZ": {
-            "value": "100000000",
-            "value_src": "ip_prop"
-          },
-          "PHASE": {
-            "value": "0.0",
-            "value_src": "ip_prop"
-          }
-        }
+        "right": "0"
       },
       "daisy_p_i": {
         "direction": "I",
@@ -395,7 +346,7 @@
           "util_ds_buf_1": {
             "vlnv": "xilinx.com:ip:util_ds_buf:2.2",
             "xci_name": "system_util_ds_buf_1_0",
-            "xci_path": "ip\\system_util_ds_buf_1_0_1\\system_util_ds_buf_1_0.xci",
+            "xci_path": "ip\\system_util_ds_buf_1_0\\system_util_ds_buf_1_0.xci",
             "inst_hier_path": "Utility_Buffers/util_ds_buf_1",
             "parameters": {
               "C_SIZE": {
@@ -406,7 +357,7 @@
           "util_ds_buf_2": {
             "vlnv": "xilinx.com:ip:util_ds_buf:2.2",
             "xci_name": "system_util_ds_buf_2_0",
-            "xci_path": "ip\\system_util_ds_buf_2_0_1\\system_util_ds_buf_2_0.xci",
+            "xci_path": "ip\\system_util_ds_buf_2_0\\system_util_ds_buf_2_0.xci",
             "inst_hier_path": "Utility_Buffers/util_ds_buf_2",
             "parameters": {
               "C_BUF_TYPE": {
@@ -509,7 +460,7 @@
           "AXI_Parse_0": {
             "vlnv": "xilinx.com:module_ref:AXI_Parse:1.0",
             "xci_name": "system_AXI_Parse_0_0",
-            "xci_path": "ip\\system_AXI_Parse_0_0_1\\system_AXI_Parse_0_0.xci",
+            "xci_path": "ip\\system_AXI_Parse_0_0\\system_AXI_Parse_0_0.xci",
             "inst_hier_path": "PS7/AXI_Parse_0",
             "reference_info": {
               "ref_type": "hdl",
@@ -631,6 +582,7 @@
                     "value_src": "const_prop"
                   }
                 },
+                "memory_map_ref": "s_axi",
                 "port_maps": {
                   "AWADDR": {
                     "physical_name": "s_axi_awaddr",
@@ -780,13 +732,10 @@
           "proc_sys_reset_0": {
             "vlnv": "xilinx.com:ip:proc_sys_reset:5.0",
             "xci_name": "system_proc_sys_reset_0_0",
-            "xci_path": "ip\\system_proc_sys_reset_0_0_1\\system_proc_sys_reset_0_0.xci",
+            "xci_path": "ip\\system_proc_sys_reset_0_0\\system_proc_sys_reset_0_0.xci",
             "inst_hier_path": "PS7/proc_sys_reset_0",
             "parameters": {
               "C_AUX_RESET_HIGH": {
-                "value": "0"
-              },
-              "C_EXT_RESET_HIGH": {
                 "value": "0"
               }
             }
@@ -794,7 +743,7 @@
           "processing_system7_0": {
             "vlnv": "xilinx.com:ip:processing_system7:5.5",
             "xci_name": "system_processing_system7_0_0",
-            "xci_path": "ip\\system_processing_system7_0_0_1\\system_processing_system7_0_0.xci",
+            "xci_path": "ip\\system_processing_system7_0_0\\system_processing_system7_0_0.xci",
             "inst_hier_path": "PS7/processing_system7_0",
             "parameters": {
               "PCW_ACT_APU_PERIPHERAL_FREQMHZ": {
@@ -1778,9 +1727,6 @@
               "PCW_M_AXI_GP0_ENABLE_STATIC_REMAP": {
                 "value": "0"
               },
-              "PCW_M_AXI_GP0_FREQMHZ": {
-                "value": "125"
-              },
               "PCW_M_AXI_GP0_ID_WIDTH": {
                 "value": "12"
               },
@@ -2089,9 +2035,6 @@
               },
               "PCW_S_AXI_HP0_DATA_WIDTH": {
                 "value": "64"
-              },
-              "PCW_S_AXI_HP0_FREQMHZ": {
-                "value": "125"
               },
               "PCW_S_AXI_HP0_ID_WIDTH": {
                 "value": "6"
@@ -2650,7 +2593,7 @@
           "axi_protocol_convert_0": {
             "vlnv": "xilinx.com:ip:axi_protocol_converter:2.1",
             "xci_name": "system_axi_protocol_convert_0_0",
-            "xci_path": "ip\\system_axi_protocol_convert_0_0_1\\system_axi_protocol_convert_0_0.xci",
+            "xci_path": "ip\\system_axi_protocol_convert_0_0\\system_axi_protocol_convert_0_0.xci",
             "inst_hier_path": "PS7/axi_protocol_convert_0",
             "parameters": {
               "ID_WIDTH": {
@@ -2803,7 +2746,7 @@
           "AXIS_Red_Pitaya_DAC_0": {
             "vlnv": "xilinx.com:module_ref:AXIS_Red_Pitaya_DAC:1.0",
             "xci_name": "system_AXIS_Red_Pitaya_DAC_0_0",
-            "xci_path": "ip\\system_AXIS_Red_Pitaya_DAC_0_0_1\\system_AXIS_Red_Pitaya_DAC_0_0.xci",
+            "xci_path": "ip\\system_AXIS_Red_Pitaya_DAC_0_0\\system_AXIS_Red_Pitaya_DAC_0_0.xci",
             "inst_hier_path": "DAC_Output/AXIS_Red_Pitaya_DAC_0",
             "reference_info": {
               "ref_type": "hdl",
@@ -2816,6 +2759,10 @@
                 "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
                 "vlnv": "xilinx.com:interface:axis_rtl:1.0",
                 "parameters": {
+                  "CLK_DOMAIN": {
+                    "value": "system_AXIS_Red_Pitaya_ADC_0_0_adc_clk",
+                    "value_src": "default_prop"
+                  },
                   "FREQ_HZ": {
                     "value": "125000000",
                     "value_src": "user_prop"
@@ -2851,10 +2798,6 @@
                   "HAS_TLAST": {
                     "value": "0",
                     "value_src": "constant"
-                  },
-                  "CLK_DOMAIN": {
-                    "value": "system_AXIS_Red_Pitaya_ADC_0_0_adc_clk",
-                    "value_src": "default_prop"
                   }
                 },
                 "port_maps": {
@@ -2944,7 +2887,7 @@
           "clk_wiz_0": {
             "vlnv": "xilinx.com:ip:clk_wiz:6.0",
             "xci_name": "system_clk_wiz_0_0",
-            "xci_path": "ip\\system_clk_wiz_0_0_1\\system_clk_wiz_0_0.xci",
+            "xci_path": "ip\\system_clk_wiz_0_0\\system_clk_wiz_0_0.xci",
             "inst_hier_path": "DAC_Output/clk_wiz_0",
             "parameters": {
               "CLKIN1_JITTER_PS": {
@@ -3040,7 +2983,7 @@
       "AXIS_Red_Pitaya_ADC_0": {
         "vlnv": "xilinx.com:module_ref:AXIS_Red_Pitaya_ADC:1.0",
         "xci_name": "system_AXIS_Red_Pitaya_ADC_0_0",
-        "xci_path": "ip\\system_AXIS_Red_Pitaya_ADC_0_0_1\\system_AXIS_Red_Pitaya_ADC_0_0.xci",
+        "xci_path": "ip\\system_AXIS_Red_Pitaya_ADC_0_0\\system_AXIS_Red_Pitaya_ADC_0_0.xci",
         "inst_hier_path": "AXIS_Red_Pitaya_ADC_0",
         "reference_info": {
           "ref_type": "hdl",
@@ -3142,7 +3085,7 @@
       "topmod_0": {
         "vlnv": "xilinx.com:module_ref:topmod:1.0",
         "xci_name": "system_topmod_0_0",
-        "xci_path": "ip\\system_topmod_0_0_1\\system_topmod_0_0.xci",
+        "xci_path": "ip\\system_topmod_0_0\\system_topmod_0_0.xci",
         "inst_hier_path": "topmod_0",
         "reference_info": {
           "ref_type": "hdl",
@@ -3155,6 +3098,10 @@
             "vlnv_bus_definition": "xilinx.com:interface:axis:1.0",
             "vlnv": "xilinx.com:interface:axis_rtl:1.0",
             "parameters": {
+              "CLK_DOMAIN": {
+                "value": "system_AXIS_Red_Pitaya_ADC_0_0_adc_clk",
+                "value_src": "constant"
+              },
               "FREQ_HZ": {
                 "value": "125000000",
                 "value_src": "constant"
@@ -3208,21 +3155,7 @@
         },
         "ports": {
           "sysClk": {
-            "direction": "I",
-            "parameters": {
-              "FREQ_HZ": {
-                "value": "125000000",
-                "value_src": "user_prop"
-              },
-              "PHASE": {
-                "value": "0.000",
-                "value_src": "default_prop"
-              },
-              "CLK_DOMAIN": {
-                "value": "system_processing_system7_0_0_FCLK_CLK0",
-                "value_src": "default_prop"
-              }
-            }
+            "direction": "I"
           },
           "aresetn": {
             "type": "rst",
@@ -3275,21 +3208,7 @@
             "right": "0"
           },
           "adcClk": {
-            "direction": "I",
-            "parameters": {
-              "FREQ_HZ": {
-                "value": "125000000",
-                "value_src": "user_prop"
-              },
-              "PHASE": {
-                "value": "0.000",
-                "value_src": "default_prop"
-              },
-              "CLK_DOMAIN": {
-                "value": "system_AXIS_Red_Pitaya_ADC_0_0_adc_clk",
-                "value_src": "default_prop"
-              }
-            }
+            "direction": "I"
           },
           "adcData_i": {
             "direction": "I",
