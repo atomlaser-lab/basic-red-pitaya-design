@@ -124,7 +124,7 @@ pwm_data(0) <= unsigned(pwmReg(7 downto 0));
 pwm_data(1) <= unsigned(pwmReg(15 downto 8));
 pwm_data(2) <= unsigned(pwmReg(23 downto 16));
 pwm_data(3) <= unsigned(pwmReg(31 downto 24));
-PMW1: PWM_Generator
+PWM1: PWM_Generator
 port map(
     clk     =>  sysClkx2,
     aresetn =>  aresetn,
